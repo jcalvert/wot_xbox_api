@@ -12,6 +12,7 @@ Add this line to your application's Gemfile:
 gem 'wot_xbox_api'
 ```
 
+
 And then execute:
 
     $ bundle
@@ -22,7 +23,12 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require 'wot_xbox_api'
+client = WotXboxApi::Client.new
+leaderboard = client.leaderboard
+leaderboard.player_hash
+```
 
 ## Development
 

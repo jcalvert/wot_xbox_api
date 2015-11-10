@@ -16,7 +16,7 @@ module WotXboxApi
     end
 
     def player_stats(player_id)
-      self.class.get("/stats/players/#{player_id}").body
+      WotXboxApi::PlayerStats.new(Nokogiri::HTML(self.class.get("/stats/players/#{player_id}").body))
     end
 
     def player_search

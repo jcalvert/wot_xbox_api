@@ -16,9 +16,8 @@ module WotXboxApi
 
     def initialize(data)
       @keys = data['data_rating']['result']['keys']
-      @values = data['data_rating']['result']['values']
       raise StandardError.new("Expected keys do not match returned keys!") if @keys != KNOWN_KEYS
-      @player_hashes = @values.collect do |value|
+      @player_hashes = data['data_rating']['result']['values'].collect do |value|
         Hash[KNOWN_KEYS.zip(value)]
       end
     end

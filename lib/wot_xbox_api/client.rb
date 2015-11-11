@@ -4,6 +4,7 @@ module WotXboxApi
     base_uri 'console.worldoftanks.com'
 
     def initialize()
+
     end
 
     #TODO: generalize later
@@ -11,12 +12,18 @@ module WotXboxApi
     #   self.class.get(url_string, options).body
     # end
 
-    def leaderboard(options={page: 1})
-      WotXboxApi::Leaderboard.new(JSON.parse(self.class.get("/leaderboard/get_ratings", options).body))
+    def self.leaderboard(options={page: 1})
+      WotXboxApi::Leaderboard.new(JSON.parse(get("/leaderboard/get_ratings", options).body))
     end
 
-    def player_stats(player_id)
-      WotXboxApi::PlayerStats.new(Nokogiri::HTML(self.class.get("/stats/players/#{player_id}").body))
+    def self.player_stats(player_id)
+      WotXboxApi::PlayerStats.new(player_id, Nokogiri::HTML(get("/stats/players/#{player_id}").body))
+    end
+
+    def self.player_tank_stats(player_id, wot_vehicle_id)
+      WotXboxApi::PlayerTankStats.new(wot_vehicle_id, Nokogiri::HTML(
+        get("/stats/players/#{player_id}/vehicle_details.html?vehicle_cd=#{wot_vehicle_id}").body
+        ))
     end
 
     def player_search

@@ -25,9 +25,10 @@ Or install it yourself as:
 
 ```ruby
 require 'wot_xbox_api'
-client = WotXboxApi::Client.new
+client = WotXboxApi::Client
 leaderboard = client.leaderboard
-leaderboard.player_hash
+player_hashes = leaderboard.player_hashes
+stats = client.player_stats(6060264)
 ```
 
 ## Development

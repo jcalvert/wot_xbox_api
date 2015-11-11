@@ -1,16 +1,54 @@
+require 'pry'
 module WotXboxApi
   class PlayerStats
 
-    attr_accessor :wot_vehicle_ids    
+    attr_accessor :wot_vehicle_ids, :battle_counts, :win_percentages, :badge_numbers,
+                 :player_id, :player_tank_stats    
     
-    def initialize(document)
-      get_wot_vehicle_ids(document)
+    def initialize(player_id, document)
+      self.player_id = player_id
+      load_wot_vehicle_ids(document)
+      load_vehicle_battle_counts(document)
+      load_vehicle_win_percentages(document)
+      load_vehicle_badge_numbers(document)
       add_unknown_vehicles(document) #not necessary where the mapping is known & persisted
+      load_player_tank_stats(document)
     end
 
-    def get_wot_vehicle_ids(document)
+    #TODO loading code is very copy pasta, needs to be DRY'd out
+    def load_wot_vehicle_ids(document)
       self.wot_vehicle_ids = document.xpath('//tr/@data-vehicle-cd').collect do |attribute| 
         attribute.value
+      end
+    end
+
+    def load_vehicle_battle_counts(document)
+      self.battle_counts = document.xpath('//td/@data-battle-count').collect do |attribute|
+        attribute.value
+      end
+    end
+
+    def load_vehicle_win_percentages(document)
+      self.win_percentages = document.xpath('//td/@data-win-percent').collect do |attribute|
+        attribute.value
+      end
+    end
+    
+    def load_vehicle_badge_numbers(document)
+      self.badge_numbers = document.xpath('//td/@data-badge-number').collect do |attribute|
+        attribute.value
+      end
+    end
+
+    def load_player_tank_stats(document)
+      self.player_tank_stats = wot_vehicle_ids.each_with_index.collect do |wot_vehicle_id, i|
+        player_tank_stat = WotXboxApi::Client.player_tank_stats(player_id, wot_vehicle_id)
+        #matching on index like this is fragile, but reduces the number 
+        #of document searches since we can extract the values with xpath
+        player_tank_stat.battle_count = self.battle_counts[i]
+        player_tank_stat.win_percentage = self.win_percentages[i]
+        player_tank_stat.badge_number = self.badge_numbers[i]
+        player_tank_stat
       end
     end
 

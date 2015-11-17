@@ -12,7 +12,7 @@ module WotXboxApi
     #   self.class.get(url_string, options).body
     # end
 
-    def self.leaderboard(options={page: 1})
+    def self.leaderboard(options={:query => {page: 1}})
       WotXboxApi::Leaderboard.new(JSON.parse(get("/leaderboard/get_ratings", options).body))
     end
 

@@ -1,4 +1,3 @@
-require 'pry'
 module WotXboxApi
   class PlayerStats
 
@@ -42,14 +41,16 @@ module WotXboxApi
 
     def load_player_tank_stats(document)
       self.player_tank_stats = wot_vehicle_ids.each_with_index.collect do |wot_vehicle_id, i|
-        player_tank_stat = WotXboxApi::Client.player_tank_stats(player_id, wot_vehicle_id)
-        #matching on index like this is fragile, but reduces the number 
-        #of document searches since we can extract the values with xpath
-        player_tank_stat.battle_count = self.battle_counts[i]
-        player_tank_stat.win_percentage = self.win_percentages[i]
-        player_tank_stat.badge_number = self.badge_numbers[i]
-        player_tank_stat
-      end
+        Thread.future WotXboxApi.pool do
+          player_tank_stat = WotXboxApi::Client.player_tank_stats(player_id, wot_vehicle_id)
+          #matching on index like this is fragile, but reduces the number 
+          #of document searches since we can extract the values with xpath
+          player_tank_stat.battle_count = self.battle_counts[i]
+          player_tank_stat.win_percentage = self.win_percentages[i]
+          player_tank_stat.badge_number = self.badge_numbers[i]
+          player_tank_stat
+        end
+      end.map(&:value)
     end
 
     def add_unknown_vehicles(document)

@@ -1,17 +1,23 @@
+require 'pry'
 module WotXboxApi
   class PlayerStats
 
     attr_accessor :wot_vehicle_ids, :battle_counts, :win_percentages, :badge_numbers,
-                 :player_id, :player_tank_stats    
+                 :player_id, :player_tank_stats, :name
     
     def initialize(player_id, document)
       self.player_id = player_id
+      load_name(document)
       load_wot_vehicle_ids(document)
       load_vehicle_battle_counts(document)
       load_vehicle_win_percentages(document)
       load_vehicle_badge_numbers(document)
       add_unknown_vehicles(document) #not necessary where the mapping is known & persisted
       load_player_tank_stats(document)
+    end
+
+    def load_name(document)
+      self.name = document.xpath("//span[@class='heading-main_inner-center']").first.children.last.text.strip
     end
 
     #TODO loading code is very copy pasta, needs to be DRY'd out

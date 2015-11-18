@@ -1,4 +1,3 @@
-require 'pry'
 module WotXboxApi
   class PlayerStats
 
@@ -7,6 +6,7 @@ module WotXboxApi
     
     def initialize(player_id, document)
       self.player_id = player_id
+      validate(document)
       load_name(document)
       load_wot_vehicle_ids(document)
       load_vehicle_battle_counts(document)
@@ -14,6 +14,13 @@ module WotXboxApi
       load_vehicle_badge_numbers(document)
       add_unknown_vehicles(document) #not necessary where the mapping is known & persisted
       load_player_tank_stats(document)
+    end
+
+    def validate(document)
+      #Signs this isn't meant as an API: Wargaming does not return a 404 
+      if document.xpath("//h3[contains(., 'This profile is unavailable')]").any?
+        raise CallFailedException.new("This user's page is marked as unavailable")
+      end
     end
 
     def load_name(document)

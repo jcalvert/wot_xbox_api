@@ -26,6 +26,12 @@ module WotXboxApi
         ))
     end
 
+    def self.clan_stats(clan_tag)
+      WotXboxApi::Clan.new(clan_tag, Nokogiri::HTML(
+        get("/en/clans/xbox/#{clan_tag}").body
+        ))
+    end
+
     def player_search
       #todo
     end
